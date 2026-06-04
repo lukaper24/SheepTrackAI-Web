@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Dodaj ovcu{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+
+                <h2 class="mb-4 text-success">
+                    Dodaj grlo
+                </h2>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Životni broj
+                        </label>
+
+                        <div class="input-group">
+                            <span class="input-group-text">HR</span>
+                            {{ form.eid_number }}
+                        </div>
+
+                        {% if form.eid_number.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.eid_number.errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="form-text">
+                            Unesi samo 9 brojeva, npr. 123456789.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Pasmina</label>
+                        {{ form.breed }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Spol</label>
+                        {{ form.sex }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Datum rođenja</label>
+                        {{ form.birth_date }}
+                    </div>
+
+                    <div class="form-check mb-3">
+                        {{ form.is_breeding_ram }}
+                        <label class="form-check-label">
+                            Rasplodni ovan
+                        </label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Napomena</label>
+                        {{ form.notes }}
+                    </div>
+
+                    <button class="btn btn-success">
+                        Spremi grlo
+                    </button>
+
+                    <a href="{% url 'sheep_list' %}" class="btn btn-outline-secondary">
+                        Odustani
+                    </a>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Ovce{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between mb-4">
+    <h2>Ovce</h2>
+
+    {% if farm %}
+        <a href="{% url 'sheep_create' %}" class="btn btn-success">
+            Dodaj ovcu
+        </a>
+    {% endif %}
+</div>
+
+{% if not farm %}
+
+<div class="alert alert-warning">
+    Prvo moraš unijeti svoj OPG.
+</div>
+
+<a href="{% url 'farm_create' %}" class="btn btn-success">
+    Dodaj OPG
+</a>
+
+{% else %}
+
+    {% if sheep %}
+
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+
+                <thead class="table-success">
+                    <tr>
+                        <th>Životni broj</th>
+                        <th>Pasmina</th>
+                        <th>Spol</th>
+                        <th>Datum rođenja</th>
+                        <th>Kategorija</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for animal in sheep %}
+                    <tr>
+                        <td class="text-nowrap">{{ animal.eid_number }}</td>
+                        <td>{{ animal.get_breed_display }}</td>
+                        <td>{{ animal.get_sex_display }}</td>
+                        <td>{{ animal.birth_date|date:"d.m.Y." }}</td>
+                        <td>
+                            <span class="badge bg-success">
+                                {{ animal.get_category_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    {% else %}
+
+        <div class="alert alert-info">
+            Još nema unesenih ovaca.
+        </div>
+
+    {% endif %}
+
+{% endif %}
+
+{% endblock %}
