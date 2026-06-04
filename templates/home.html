@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Početna | SheepTrackAI{% endblock %}
+
+{% block content %}
+
+<section class="py-5">
+    <div class="row align-items-center">
+        <div class="col-md-7">
+            <h1 class="display-5 fw-bold text-success">
+                SheepTrackAI Web
+            </h1>
+
+            <p class="lead mt-3">
+                Profesionalna web aplikacija za evidenciju ovaca, janjenja,
+                janjadi, markica i veterinarskih zapisa na OPG-u.
+            </p>
+
+            <a href="#" class="btn btn-success btn-lg mt-3">
+                Kreni s evidencijom
+            </a>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title">Brzi pregled</h5>
+
+                    <div class="row text-center mt-4">
+                        <div class="col-6 mb-3">
+                            <h3 class="text-success">0</h3>
+                            <p class="text-muted">Ovaca</p>
+                        </div>
+
+                        <div class="col-6 mb-3">
+                            <h3 class="text-success">0</h3>
+                            <p class="text-muted">Janjenja</p>
+                        </div>
+
+                        <div class="col-6">
+                            <h3 class="text-success">0</h3>
+                            <p class="text-muted">Janjadi</p>
+                        </div>
+
+                        <div class="col-6">
+                            <h3 class="text-success">0</h3>
+                            <p class="text-muted">Veterinarskih zapisa</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mt-4">
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title">Evidencija ovaca</h5>
+                    <p class="card-text">
+                        Unos životnog broja, pasmine, datuma rođenja, spola,
+                        statusa i pripadnosti OPG-u.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title">Janjenja i janjad</h5>
+                    <p class="card-text">
+                        Evidencija datuma janjenja, više janjadi po ovci,
+                        brojeva markica i datuma markiranja.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title">AI upozorenja</h5>
+                    <p class="card-text">
+                        Sustav će kasnije prikazivati upozorenja za cijepljenje,
+                        liječenja i predviđene datume janjenja.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
