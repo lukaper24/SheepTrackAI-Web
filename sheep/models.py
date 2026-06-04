@@ -135,7 +135,7 @@ class Sheep(models.Model):
                 return 'OVAN'
             return 'OVNIC'
 
-        if self.lambings.exists():
+        if self.pk and self.lambings.exists():
             return 'OVCA'
 
         return 'SILJEZICA'
