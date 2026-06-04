@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Dodaj vaganje{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+
+        <h2 class="text-success mb-4">Dodaj vaganje</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <label class="form-label">Grlo</label>
+                    {{ form.sheep }}
+                    <div class="form-text">Odaberi grlo ako važeš označenu životinju.</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Janje</label>
+                    {{ form.lamb }}
+                    <div class="form-text">Odaberi janje ako još nije dio grla.</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Datum vaganja</label>
+                    {{ form.date }}
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Težina kg</label>
+                    {{ form.weight }}
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Napomena</label>
+                    {{ form.notes }}
+                </div>
+
+            </div>
+
+            <button class="btn btn-success mt-4">
+                Spremi vaganje
+            </button>
+
+            <a href="{% url 'weight_list' %}" class="btn btn-outline-secondary mt-4">
+                Odustani
+            </a>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

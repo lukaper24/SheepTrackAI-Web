@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Vaganja{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>Vaganja</h2>
+        <p class="text-muted mb-0">
+            Evidencija težine grla i janjadi.
+        </p>
+    </div>
+
+    <a href="{% url 'weight_create' %}" class="btn btn-success">
+        Dodaj vaganje
+    </a>
+</div>
+
+{% if records %}
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-success">
+            <tr>
+                <th>Datum</th>
+                <th>Životinja</th>
+                <th>Tip</th>
+                <th>Težina</th>
+                <th>Napomena</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ record.date|date:"d.m.Y." }}</td>
+
+                <td>
+                    {% if record.sheep %}
+                        {{ record.sheep.eid_number }}
+                    {% elif record.lamb %}
+                        {{ record.lamb.official_tag|default:record.lamb.initial_tag }}
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if record.sheep %}
+                        Grlo
+                    {% else %}
+                        Janje
+                    {% endif %}
+                </td>
+
+                <td>
+                    <strong>{{ record.weight }} kg</strong>
+                </td>
+
+                <td>
+                    {{ record.notes|default:"-" }}
+                </td>
+
+                <td class="text-end">
+                    <a href="{% url 'weight_delete' record.pk %}"
+                       class="btn btn-sm btn-outline-danger">
+                        Obriši
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% else %}
+
+<div class="alert alert-info">
+    Još nema unesenih vaganja.
+</div>
+
+{% endif %}
+
+{% endblock %}

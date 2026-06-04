@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Brisanje vaganja{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+
+        <h2 class="text-danger">Obriši vaganje</h2>
+
+        <p>
+            Želiš li obrisati zapis vaganja od
+            <strong>{{ record.date|date:"d.m.Y." }}</strong>
+            za
+            <strong>{{ record.weight }} kg</strong>?
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <button class="btn btn-danger">
+                Obriši
+            </button>
+
+            <a href="{% url 'weight_list' %}" class="btn btn-secondary">
+                Odustani
+            </a>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}
