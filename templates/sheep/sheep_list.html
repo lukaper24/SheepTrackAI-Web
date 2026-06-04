@@ -1,15 +1,18 @@
 {% extends 'base.html' %}
 
-{% block title %}Ovce{% endblock %}
+{% block title %}Grla{% endblock %}
 
 {% block content %}
 
-<div class="d-flex justify-content-between mb-4">
-    <h2>Ovce</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0">Grla</h2>
+        <p class="text-muted mb-0">Pregled svih ovaca, janjadi, šilježica i ovnova.</p>
+    </div>
 
     {% if farm %}
         <a href="{% url 'sheep_create' %}" class="btn btn-success">
-            Dodaj ovcu
+            Dodaj grlo
         </a>
     {% endif %}
 </div>
@@ -26,47 +29,105 @@
 
 {% else %}
 
-    {% if sheep %}
+<form method="get" class="card card-body shadow-sm border-0 mb-4">
+    <div class="row g-3">
 
-        <div class="table-responsive">
-            <table class="table table-striped align-middle">
-
-                <thead class="table-success">
-                    <tr>
-                        <th>Životni broj</th>
-                        <th>Pasmina</th>
-                        <th>Spol</th>
-                        <th>Datum rođenja</th>
-                        <th>Kategorija</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for animal in sheep %}
-                    <tr>
-                        <td class="text-nowrap">{{ animal.eid_number }}</td>
-                        <td>{{ animal.get_breed_display }}</td>
-                        <td>{{ animal.get_sex_display }}</td>
-                        <td>{{ animal.birth_date|date:"d.m.Y." }}</td>
-                        <td>
-                            <span class="badge bg-success">
-                                {{ animal.get_category_display }}
-                            </span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-
-            </table>
+        <div class="col-md-6">
+            <label class="form-label">Pretraga po životnom broju</label>
+            <input type="text"
+                   name="q"
+                   class="form-control"
+                   placeholder="npr. 123456789"
+                   value="{{ request.GET.q }}">
         </div>
 
-    {% else %}
+        <div class="col-md-4">
+            <label class="form-label">Kategorija</label>
+            <select name="category" class="form-select">
+                <option value="">Sve kategorije</option>
 
-        <div class="alert alert-info">
-            Još nema unesenih ovaca.
+                {% for value, label in categories %}
+                    <option value="{{ value }}"
+                        {% if request.GET.category == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
         </div>
 
-    {% endif %}
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-success w-100">
+                Filtriraj
+            </button>
+        </div>
+
+    </div>
+</form>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h4 class="text-success">{{ sheep.count }}</h4>
+                <p class="mb-0 text-muted">Ukupno grla</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if sheep %}
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+
+        <thead class="table-success">
+            <tr>
+                <th>Životni broj</th>
+                <th>Pasmina</th>
+                <th>Spol</th>
+                <th>Datum rođenja</th>
+                <th>Kategorija</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for animal in sheep %}
+            <tr>
+                <td class="text-nowrap fw-semibold">
+                    {{ animal.eid_number }}
+                </td>
+
+                <td>{{ animal.get_breed_display }}</td>
+                <td>{{ animal.get_sex_display }}</td>
+                <td>{{ animal.birth_date|date:"d.m.Y." }}</td>
+
+                <td>
+                    <span class="badge bg-success">
+                        {{ animal.get_category_display }}
+                    </span>
+                </td>
+
+                <td class="text-end">
+                    <a href="{% url 'sheep_detail' animal.pk %}"
+                       class="btn btn-sm btn-outline-success">
+                        Detalji
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+{% else %}
+
+<div class="alert alert-info">
+    Nema pronađenih grla.
+</div>
+
+{% endif %}
 
 {% endif %}
 

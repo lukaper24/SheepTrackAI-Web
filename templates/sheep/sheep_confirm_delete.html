@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Brisanje grla{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+
+                <h2 class="text-danger mb-3">
+                    Obriši grlo
+                </h2>
+
+                <p>
+                    Jesi li siguran da želiš obrisati grlo
+                    <strong>{{ animal.eid_number }}</strong>?
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <button class="btn btn-danger">
+                        Da, obriši
+                    </button>
+
+                    <a href="{% url 'sheep_detail' animal.pk %}"
+                       class="btn btn-secondary">
+                        Odustani
+                    </a>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
