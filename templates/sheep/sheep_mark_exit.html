@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Promjena statusa grla{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+
+                <h2 class="mb-3 text-success">
+                    Promjena statusa
+                </h2>
+
+                <p>
+                    Grlo:
+                    <strong>{{ animal.eid_number }}</strong>
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Datum</label>
+                        {{ form.exit_date }}
+                        {% if form.exit_date.errors %}
+                            <div class="text-danger small">{{ form.exit_date.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Razlog / napomena</label>
+                        {{ form.exit_reason }}
+                    </div>
+
+                    <button class="btn btn-success">
+                        Spremi
+                    </button>
+
+                    <a href="{% url 'sheep_detail' animal.pk %}" class="btn btn-outline-secondary">
+                        Odustani
+                    </a>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

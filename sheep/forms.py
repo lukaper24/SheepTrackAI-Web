@@ -14,7 +14,6 @@ class SheepForm(forms.ModelForm):
             "pattern": "[0-9]{9}",
         })
     )
-
     class Meta:
         model = Sheep
         fields = [
@@ -42,7 +41,6 @@ class SheepForm(forms.ModelForm):
                 "placeholder": "Napomena..."
             }),
         }
-
     def clean_eid_number(self):
         eid = self.cleaned_data.get("eid_number", "").strip()
 
@@ -58,3 +56,23 @@ class SheepForm(forms.ModelForm):
             raise forms.ValidationError("Životni broj mora imati točno 9 brojeva.")
 
         return f"HR {eid}"
+    
+class SheepExitForm(forms.ModelForm):
+        class Meta:
+            model = Sheep
+            fields = [
+                "exit_date",
+                "exit_reason",
+            ]
+
+            widgets = {
+                "exit_date": forms.DateInput(attrs={
+                    "type": "date",
+                    "class": "form-control"
+                }),
+                "exit_reason": forms.Textarea(attrs={
+                    "rows": 3,
+                    "class": "form-control",
+                    "placeholder": "Razlog, kupac, napomena..."
+                }),
+            }

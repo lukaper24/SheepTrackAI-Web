@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 
 from farms.models import Farm
-from .forms import SheepForm
+from .forms import SheepForm, SheepExitForm
 from .models import Sheep
 
 
@@ -17,7 +17,10 @@ def sheep_list(request):
     sheep = Sheep.objects.none()
 
     if farm:
-        sheep = Sheep.objects.filter(farm=farm).order_by("eid_number")
+        sheep = Sheep.objects.filter(
+            farm=farm,
+            status='ACTIVE'
+        ).order_by('eid_number')
 
         query = request.GET.get("q")
         category = request.GET.get("category")
@@ -117,4 +120,54 @@ def sheep_delete(request, pk):
 
     return render(request, "sheep/sheep_confirm_delete.html", {
         "animal": animal
+    })
+
+@login_required
+def sheep_archive(request):
+
+    farm = get_user_farm(request.user)
+
+    sheep = Sheep.objects.filter(
+        farm=farm
+    ).exclude(
+        status='ACTIVE'
+    ).order_by('-exit_date')
+
+    return render(
+        request,
+        'sheep/sheep_archive.html',
+        {
+            'sheep': sheep
+        }
+    )
+@login_required
+def sheep_mark_exit(request, pk, status):
+    farm = get_user_farm(request.user)
+
+    animal = get_object_or_404(
+        Sheep,
+        pk=pk,
+        farm=farm
+    )
+
+    allowed_statuses = ["SOLD", "DEAD", "SLAUGHTERED"]
+
+    if status not in allowed_statuses:
+        return redirect("sheep_detail", pk=animal.pk)
+
+    if request.method == "POST":
+        form = SheepExitForm(request.POST, instance=animal)
+
+        if form.is_valid():
+            animal = form.save(commit=False)
+            animal.status = status
+            animal.save()
+            return redirect("sheep_archive")
+    else:
+        form = SheepExitForm(instance=animal)
+
+    return render(request, "sheep/sheep_mark_exit.html", {
+        "form": form,
+        "animal": animal,
+        "status": status,
     })

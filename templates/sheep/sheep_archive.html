@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Arhiva grla{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>Arhiva grla</h2>
+        <p class="text-muted mb-0">Prodana, uginula i zaklana grla.</p>
+    </div>
+
+    <a href="{% url 'sheep_list' %}" class="btn btn-outline-success">
+        Aktivna grla
+    </a>
+</div>
+
+{% if sheep %}
+
+<table class="table table-hover align-middle">
+    <thead class="table-success">
+        <tr>
+            <th>Životni broj</th>
+            <th>Pasmina</th>
+            <th>Spol</th>
+            <th>Status</th>
+            <th>Datum izlaska</th>
+            <th>Razlog</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for animal in sheep %}
+        <tr>
+            <td>{{ animal.eid_number }}</td>
+            <td>{{ animal.get_breed_display }}</td>
+            <td>{{ animal.get_sex_display }}</td>
+            <td>{{ animal.get_status_display }}</td>
+            <td>{{ animal.exit_date|date:"d.m.Y." }}</td>
+            <td>{{ animal.exit_reason|default:"-" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% else %}
+
+<div class="alert alert-info">
+    Arhiva je prazna.
+</div>
+
+{% endif %}
+
+{% endblock %}

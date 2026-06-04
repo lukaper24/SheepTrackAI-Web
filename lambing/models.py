@@ -120,6 +120,15 @@ class Lamb(models.Model):
         verbose_name="Napomena"
     )
 
+    converted_sheep = models.OneToOneField(
+    Sheep,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name="source_lamb",
+    verbose_name="Povezano grlo"
+)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def clean(self):
@@ -151,13 +160,28 @@ class Lamb(models.Model):
                 )
 
     def save(self, *args, **kwargs):
-        if self.official_tag:
-            official = self.official_tag.upper().replace("HR", "").replace(" ", "").strip()
-            self.official_tag = f"HR {official}"
+            if self.official_tag:
+                official = self.official_tag.upper().replace("HR", "").replace(" ", "").strip()
+                self.official_tag = f"HR {official}"
 
-        self.full_clean()
-        super().save(*args, **kwargs)
+            self.full_clean()
+            super().save(*args, **kwargs)
 
+            if self.official_tag and not self.converted_sheep:
+                mother = self.lambing.mother
+
+                sheep = Sheep.objects.create(
+                    farm=mother.farm,
+                    eid_number=self.official_tag,
+                    breed=mother.breed,
+                    sex=self.sex,
+                    birth_date=self.lambing.lambing_date,
+                    is_breeding_ram=False,
+                    notes=f"Automatski kreirano iz janjenja {self.lambing.lambing_date}."
+                )
+
+                self.converted_sheep = sheep
+                super().save(update_fields=["converted_sheep"])
     def __str__(self):
         if self.official_tag:
             return self.official_tag

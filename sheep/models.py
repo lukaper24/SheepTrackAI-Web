@@ -1,10 +1,10 @@
 from datetime import date, timedelta
-
-from django.db import models
-from django.core.validators import RegexValidator
-from farms.models import Farm
-from django.core.exceptions import ValidationError
 import re
+
+from django.core.exceptions import ValidationError
+from django.db import models
+
+from farms.models import Farm
 
 
 class Sheep(models.Model):
@@ -48,17 +48,42 @@ class Sheep(models.Model):
         ('OVAN', 'Ovan'),
     ]
 
-    farm = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name='sheep')
+    STATUS_CHOICES = [
+        ('ACTIVE', 'Aktivno'),
+        ('SOLD', 'Prodano'),
+        ('DEAD', 'Uginulo'),
+        ('SLAUGHTERED', 'Zaklano'),
+    ]
+
+    farm = models.ForeignKey(
+        Farm,
+        on_delete=models.CASCADE,
+        related_name='sheep'
+    )
 
     eid_number = models.CharField(
-    max_length=12,
-    unique=True,
-    verbose_name="Životni broj"
-)
+        max_length=12,
+        unique=True,
+        verbose_name="Životni broj"
+    )
 
-    breed = models.CharField(max_length=50, choices=BREED_CHOICES, default='SOLCAVSKO_JEZERSKA', verbose_name="Pasmina")
-    sex = models.CharField(max_length=1, choices=SEX_CHOICES, default='Z', verbose_name="Spol")
-    birth_date = models.DateField(verbose_name="Datum rođenja")
+    breed = models.CharField(
+        max_length=50,
+        choices=BREED_CHOICES,
+        default='SOLCAVSKO_JEZERSKA',
+        verbose_name="Pasmina"
+    )
+
+    sex = models.CharField(
+        max_length=1,
+        choices=SEX_CHOICES,
+        default='Z',
+        verbose_name="Spol"
+    )
+
+    birth_date = models.DateField(
+        verbose_name="Datum rođenja"
+    )
 
     is_breeding_ram = models.BooleanField(
         default=False,
@@ -72,8 +97,32 @@ class Sheep(models.Model):
         verbose_name="Kategorija"
     )
 
-    notes = models.TextField(blank=True, verbose_name="Napomena")
-    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='ACTIVE',
+        verbose_name="Status"
+    )
+
+    exit_date = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name="Datum izlaska"
+    )
+
+    exit_reason = models.TextField(
+        blank=True,
+        verbose_name="Razlog / napomena izlaska"
+    )
+
+    notes = models.TextField(
+        blank=True,
+        verbose_name="Napomena"
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def calculate_category(self):
         six_months_ago = date.today() - timedelta(days=183)
@@ -86,8 +135,11 @@ class Sheep(models.Model):
                 return 'OVAN'
             return 'OVNIC'
 
+        if self.lambings.exists():
+            return 'OVCA'
+
         return 'SILJEZICA'
-    
+
     def clean(self):
         pattern = r"^HR\s\d{9}$"
 
@@ -96,14 +148,21 @@ class Sheep(models.Model):
                 "eid_number": "Životni broj mora biti u formatu HR 123456789."
             })
 
+        if self.status != 'ACTIVE' and not self.exit_date:
+            raise ValidationError({
+                "exit_date": "Za prodano, uginulo ili zaklano grlo moraš unijeti datum izlaska."
+            })
+
     def save(self, *args, **kwargs):
-            number = self.eid_number.upper().replace("HR", "").strip()
+        number = self.eid_number.upper().replace("HR", "").replace(" ", "").strip()
 
-            if number.isdigit() and len(number) == 9:
-                self.eid_number = f"HR {number}"
+        if number.isdigit() and len(number) == 9:
+            self.eid_number = f"HR {number}"
 
-            self.full_clean()
-            super().save(*args, **kwargs)
+        self.category = self.calculate_category()
+
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
-            return self.eid_number
+        return self.eid_number

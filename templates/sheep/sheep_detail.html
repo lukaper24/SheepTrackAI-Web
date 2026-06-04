@@ -7,66 +7,57 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h2>{{ animal.eid_number }}</h2>
-        <p class="text-muted mb-0">Detalji evidentiranog grla</p>
+        <p class="text-muted mb-0">Kartica grla</p>
     </div>
 
     <div>
         <a href="{% url 'sheep_update' animal.pk %}" class="btn btn-outline-success">
             Uredi
         </a>
-
-        <a href="{% url 'sheep_delete' animal.pk %}" class="btn btn-outline-danger">
-            Obriši
+        <a href="{% url 'sheep_list' %}" class="btn btn-outline-secondary">
+            Natrag
         </a>
     </div>
 </div>
 
-<div class="card shadow-sm border-0">
+<div class="card shadow-sm border-0 mb-4">
     <div class="card-body">
 
-        <div class="row mb-3">
-            <div class="col-md-4 text-muted">Životni broj</div>
-            <div class="col-md-8 fw-semibold">{{ animal.eid_number }}</div>
-        </div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <strong>Životni broj:</strong><br>
+                {{ animal.eid_number }}
+            </div>
 
-        <div class="row mb-3">
-            <div class="col-md-4 text-muted">Pasmina</div>
-            <div class="col-md-8">{{ animal.get_breed_display }}</div>
-        </div>
+            <div class="col-md-4">
+                <strong>Pasmina:</strong><br>
+                {{ animal.get_breed_display }}
+            </div>
 
-        <div class="row mb-3">
-            <div class="col-md-4 text-muted">Spol</div>
-            <div class="col-md-8">{{ animal.get_sex_display }}</div>
-        </div>
+            <div class="col-md-4">
+                <strong>Spol:</strong><br>
+                {{ animal.get_sex_display }}
+            </div>
 
-        <div class="row mb-3">
-            <div class="col-md-4 text-muted">Datum rođenja</div>
-            <div class="col-md-8">{{ animal.birth_date|date:"d.m.Y." }}</div>
-        </div>
+            <div class="col-md-4">
+                <strong>Datum rođenja:</strong><br>
+                {{ animal.birth_date|date:"d.m.Y." }}
+            </div>
 
-        <div class="row mb-3">
-            <div class="col-md-4 text-muted">Kategorija</div>
-            <div class="col-md-8">
+            <div class="col-md-4">
+                <strong>Kategorija:</strong><br>
                 <span class="badge bg-success">
                     {{ animal.get_category_display }}
                 </span>
             </div>
-        </div>
 
-        <div class="row mb-3">
-            <div class="col-md-4 text-muted">Rasplodni ovan</div>
-            <div class="col-md-8">
-                {% if animal.is_breeding_ram %}
-                    Da
-                {% else %}
-                    Ne
-                {% endif %}
+            <div class="col-md-4">
+                <strong>Status:</strong><br>
+                {{ animal.get_status_display }}
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-4 text-muted">Napomena</div>
-            <div class="col-md-8">
+            <div class="col-12">
+                <strong>Napomena:</strong><br>
                 {{ animal.notes|default:"Nema napomene." }}
             </div>
         </div>
@@ -74,8 +65,55 @@
     </div>
 </div>
 
-<a href="{% url 'sheep_list' %}" class="btn btn-secondary mt-4">
-    Natrag
-</a>
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+
+        <h4 class="mb-3">Promjena statusa</h4>
+
+        <a href="{% url 'sheep_mark_exit' animal.pk 'SOLD' %}" class="btn btn-outline-primary">
+            Označi kao prodano
+        </a>
+
+        <a href="{% url 'sheep_mark_exit' animal.pk 'DEAD' %}" class="btn btn-outline-danger">
+            Označi kao uginulo
+        </a>
+
+        <a href="{% url 'sheep_mark_exit' animal.pk 'SLAUGHTERED' %}" class="btn btn-outline-warning">
+            Označi kao zaklano
+        </a>
+
+    </div>
+</div>
+
+<div class="row g-4">
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5>Janjenja</h5>
+                <p class="display-6 text-success">{{ animal.lambings.count }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5>Veterinarski zapisi</h5>
+                <p class="display-6 text-success">{{ animal.veterinary_records.count }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h5>Pripusti</h5>
+                <p class="display-6 text-success">{{ animal.breedings_as_ewe.count }}</p>
+            </div>
+        </div>
+    </div>
+
+</div>
 
 {% endblock %}

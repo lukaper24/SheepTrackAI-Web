@@ -38,6 +38,9 @@
                     <a class="nav-link" href="{% url 'sheep_list' %}">Grla</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'sheep_archive' %}">Arhiva</a>
+                </li>
+                <li class="nav-item">
                         <a class="nav-link" href="{% url 'lambing_list' %}">Janjenja</a>
                 </li>
 
@@ -51,7 +54,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'veterinary_list' %}">Veterina</a>
                 </li>
-
                 {% if user.is_authenticated %}
 
                 <li class="nav-item">
