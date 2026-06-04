@@ -1,99 +1,186 @@
 {% extends 'base.html' %}
 
-{% block title %}Početna | SheepTrackAI{% endblock %}
+{% block title %}Dashboard | SheepTrackAI{% endblock %}
 
 {% block content %}
 
-<section class="py-5">
-    <div class="row align-items-center">
-        <div class="col-md-7">
-            <h1 class="display-5 fw-bold text-success">
-                SheepTrackAI Web
-            </h1>
+<div class="mb-4">
+    <h1 class="text-success fw-bold">SheepTrackAI Dashboard</h1>
+    <p class="text-muted">
+        Pametna evidencija OPG-a, grla, janjenja, janjadi i službenih markica.
+    </p>
+</div>
 
-            <p class="lead mt-3">
-                Profesionalna web aplikacija za evidenciju ovaca, janjenja,
-                janjadi, markica i veterinarskih zapisa na OPG-u.
-            </p>
+{% if not farm %}
 
-            <a href="#" class="btn btn-success btn-lg mt-3">
-                Kreni s evidencijom
-            </a>
+<div class="alert alert-warning">
+    Prvo dodaj podatke o svom OPG-u kako bi aplikacija mogla prikazivati statistiku.
+</div>
+
+<a href="{% url 'farm_create' %}" class="btn btn-success">
+    Dodaj OPG
+</a>
+
+{% else %}
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-2">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h3 class="text-success">{{ stats.total_sheep }}</h3>
+                <p class="mb-0 text-muted">Ukupno grla</p>
+            </div>
         </div>
+    </div>
 
-        <div class="col-md-5">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="card-title">Brzi pregled</h5>
+    <div class="col-md-2">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h3 class="text-success">{{ stats.ewes }}</h3>
+                <p class="mb-0 text-muted">Ovce</p>
+            </div>
+        </div>
+    </div>
 
-                    <div class="row text-center mt-4">
-                        <div class="col-6 mb-3">
-                            <h3 class="text-success">0</h3>
-                            <p class="text-muted">Ovaca</p>
+    <div class="col-md-2">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h3 class="text-success">{{ stats.rams }}</h3>
+                <p class="mb-0 text-muted">Ovnovi</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h3 class="text-success">{{ stats.lambs }}</h3>
+                <p class="mb-0 text-muted">Janjad</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h3 class="text-success">{{ stats.lambings }}</h3>
+                <p class="mb-0 text-muted">Janjenja</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h3 class="text-danger">{{ stats.unmarked_lambs }}</h3>
+                <p class="mb-0 text-muted">Bez markice</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4">
+
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="mb-3">Janjenja po mjesecima</h4>
+                <canvas id="lambingChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="mb-3">AI upozorenja</h4>
+
+                {% if alerts %}
+                    {% for alert in alerts %}
+                        <div class="alert alert-warning">
+                            {{ alert }}
                         </div>
-
-                        <div class="col-6 mb-3">
-                            <h3 class="text-success">0</h3>
-                            <p class="text-muted">Janjenja</p>
-                        </div>
-
-                        <div class="col-6">
-                            <h3 class="text-success">0</h3>
-                            <p class="text-muted">Janjadi</p>
-                        </div>
-
-                        <div class="col-6">
-                            <h3 class="text-success">0</h3>
-                            <p class="text-muted">Veterinarskih zapisa</p>
-                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-success">
+                        Trenutno nema važnih upozorenja.
                     </div>
+                {% endif %}
 
-                </div>
             </div>
         </div>
     </div>
-</section>
 
-<section class="mt-4">
-    <div class="row g-4">
+</div>
 
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
+<div class="row g-4 mt-2">
+
+    <div class="col-md-4">
+        <a href="{% url 'sheep_list' %}" class="text-decoration-none">
+            <div class="card shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <h5 class="card-title">Evidencija ovaca</h5>
-                    <p class="card-text">
-                        Unos životnog broja, pasmine, datuma rođenja, spola,
-                        statusa i pripadnosti OPG-u.
-                    </p>
+                    <h5 class="text-success">Grla</h5>
+                    <p class="text-muted mb-0">Pregled, unos, uređivanje i brisanje grla.</p>
                 </div>
             </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="card-title">Janjenja i janjad</h5>
-                    <p class="card-text">
-                        Evidencija datuma janjenja, više janjadi po ovci,
-                        brojeva markica i datuma markiranja.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="card-title">AI upozorenja</h5>
-                    <p class="card-text">
-                        Sustav će kasnije prikazivati upozorenja za cijepljenje,
-                        liječenja i predviđene datume janjenja.
-                    </p>
-                </div>
-            </div>
-        </div>
-
+        </a>
     </div>
-</section>
+
+    <div class="col-md-4">
+        <a href="{% url 'lambing_list' %}" class="text-decoration-none">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="text-success">Janjenja</h5>
+                    <p class="text-muted mb-0">Evidencija janjenja i više janjadi po ovci.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-4">
+        <a href="{% url 'lamb_list' %}" class="text-decoration-none">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="text-success">Janjad</h5>
+                    <p class="text-muted mb-0">Inicijalne oznake, službene markice i datumi markiranja.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const ctx = document.getElementById("lambingChart");
+
+new Chart(ctx, {
+    type: "bar",
+    data: {
+        labels: {{ chart_labels|safe }},
+        datasets: [{
+            label: "Broj janjenja",
+            data: {{ chart_data|safe }},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0
+                }
+            }
+        }
+    }
+});
+</script>
+
+{% endif %}
 
 {% endblock %}
