@@ -121,17 +121,18 @@ def sheep_delete(request, pk):
     return render(request, "sheep/sheep_confirm_delete.html", {
         "animal": animal
     })
-
 @login_required
 def sheep_archive(request):
-
     farm = get_user_farm(request.user)
 
-    sheep = Sheep.objects.filter(
-        farm=farm
-    ).exclude(
-        status='ACTIVE'
-    ).order_by('-exit_date')
+    sheep = Sheep.objects.none()
+
+    if farm:
+        sheep = Sheep.objects.filter(
+            farm=farm
+        ).exclude(
+            status='ACTIVE'
+        ).order_by('-exit_date')
 
     return render(
         request,
@@ -170,4 +171,26 @@ def sheep_mark_exit(request, pk, status):
         "form": form,
         "animal": animal,
         "status": status,
+    })
+
+@login_required
+def sheep_restore(request, pk):
+    farm = get_user_farm(request.user)
+
+    animal = get_object_or_404(
+        Sheep,
+        pk=pk,
+        farm=farm
+    )
+
+    if request.method == "POST":
+        animal.status = "ACTIVE"
+        animal.exit_date = None
+        animal.exit_reason = ""
+        animal.save()
+
+        return redirect("sheep_detail", pk=animal.pk)
+
+    return render(request, "sheep/sheep_restore.html", {
+        "animal": animal
     })

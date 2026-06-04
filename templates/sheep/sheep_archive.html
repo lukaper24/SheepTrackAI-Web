@@ -7,7 +7,9 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h2>Arhiva grla</h2>
-        <p class="text-muted mb-0">Prodana, uginula i zaklana grla.</p>
+        <p class="text-muted mb-0">
+            Prodana, uginula i zaklana grla.
+        </p>
     </div>
 
     <a href="{% url 'sheep_list' %}" class="btn btn-outline-success">
@@ -17,36 +19,105 @@
 
 {% if sheep %}
 
-<table class="table table-hover align-middle">
-    <thead class="table-success">
-        <tr>
-            <th>Životni broj</th>
-            <th>Pasmina</th>
-            <th>Spol</th>
-            <th>Status</th>
-            <th>Datum izlaska</th>
-            <th>Razlog</th>
-        </tr>
-    </thead>
+<div class="table-responsive">
 
-    <tbody>
-        {% for animal in sheep %}
-        <tr>
-            <td>{{ animal.eid_number }}</td>
-            <td>{{ animal.get_breed_display }}</td>
-            <td>{{ animal.get_sex_display }}</td>
-            <td>{{ animal.get_status_display }}</td>
-            <td>{{ animal.exit_date|date:"d.m.Y." }}</td>
-            <td>{{ animal.exit_reason|default:"-" }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <table class="table table-hover align-middle">
+
+        <thead class="table-success">
+            <tr>
+                <th>Životni broj</th>
+                <th>Pasmina</th>
+                <th>Spol</th>
+                <th>Status</th>
+                <th>Datum izlaska</th>
+                <th>Razlog</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for animal in sheep %}
+
+            <tr>
+
+                <td>
+                    <strong>{{ animal.eid_number }}</strong>
+                </td>
+
+                <td>
+                    {{ animal.get_breed_display }}
+                </td>
+
+                <td>
+                    {{ animal.get_sex_display }}
+                </td>
+
+                <td>
+
+                    {% if animal.status == "SOLD" %}
+
+                        <span class="badge bg-primary">
+                            Prodano
+                        </span>
+
+                    {% elif animal.status == "DEAD" %}
+
+                        <span class="badge bg-danger">
+                            Uginulo
+                        </span>
+
+                    {% elif animal.status == "SLAUGHTERED" %}
+
+                        <span class="badge bg-warning text-dark">
+                            Zaklano
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-secondary">
+                            {{ animal.get_status_display }}
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+                    {% if animal.exit_date %}
+                        {{ animal.exit_date|date:"d.m.Y." }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+
+                <td>
+                    {{ animal.exit_reason|default:"-" }}
+                </td>
+
+                <td class="text-end">
+
+                    <a href="{% url 'sheep_restore' animal.pk %}"
+                       class="btn btn-sm btn-outline-success">
+                        Vrati u aktivna
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
 
 {% else %}
 
 <div class="alert alert-info">
-    Arhiva je prazna.
+    Arhiva je trenutno prazna.
 </div>
 
 {% endif %}
