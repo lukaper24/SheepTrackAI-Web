@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Moj OPG{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between mb-4">
+
+    <h2>Moj OPG</h2>
+
+    {% if not farm %}
+        <a href="{% url 'farm_create' %}"
+           class="btn btn-success">
+            Dodaj OPG
+        </a>
+    {% endif %}
+
+</div>
+
+{% if farm %}
+
+<div class="card shadow-sm">
+
+    <div class="card-body">
+
+        <h3>{{ farm.name }}</h3>
+
+        <hr>
+
+        <p>
+            <strong>Adresa:</strong>
+            {{ farm.address }}
+        </p>
+
+        <p>
+            <strong>Mjesto:</strong>
+            {{ farm.city }}
+        </p>
+
+        <p>
+            <strong>Telefon:</strong>
+            {{ farm.phone }}
+        </p>
+
+        <p>
+            <strong>Email:</strong>
+            {{ farm.email }}
+        </p>
+
+    </div>
+
+</div>
+
+{% else %}
+
+<div class="alert alert-info">
+
+    Još nemaš kreiran OPG.
+
+</div>
+
+{% endif %}
+
+{% endblock %}
