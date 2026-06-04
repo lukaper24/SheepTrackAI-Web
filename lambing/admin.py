@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import Lambing, Lamb
 
-# Register your models here.
+admin.site.register(Lambing)
+admin.site.register(Lamb)

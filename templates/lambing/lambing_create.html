@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Dodaj janjenje{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+
+        <h2 class="text-success mb-4">Dodaj janjenje</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {% if form.errors %}
+                <div class="alert alert-warning">
+                    Provjeri unesene podatke. Neka pravila janjenja nisu zadovoljena.
+                </div>
+            {% endif %}
+
+            <div class="row g-3">
+
+                <div class="col-md-3">
+                    <label class="form-label">Majka</label>
+                    {{ form.mother }}
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Datum janjenja</label>
+                    {{ form.lambing_date }}
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Broj janjadi</label>
+                    {{ form.lamb_count }}
+                    {% if form.lamb_count.errors %}
+                        <div class="text-danger small">{{ form.lamb_count.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Otac / ovan</label>
+                    <div class="input-group">
+                        <span class="input-group-text">HR</span>
+                        {{ form.father }}
+                    </div>
+                    <div class="form-text">Unesi samo 9 brojeva.</div>
+                    {% if form.father.errors %}
+                        <div class="text-danger small">{{ form.father.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Napomena</label>
+                    {{ form.notes }}
+                </div>
+
+            </div>
+
+            <hr class="my-4">
+
+            <h4 class="mb-3">Janjad</h4>
+
+            <p class="text-muted">
+                Za svako janje obavezno unesi inicijalnu oznaku od 3 broja.
+                Službena markica može se dodati odmah ili naknadno.
+            </p>
+
+            {{ formset.management_form }}
+
+            {% for lamb_form in formset %}
+                <div class="card mb-3 border-0 bg-light lamb-card" data-index="{{ forloop.counter }}">
+                    <div class="card-body">
+
+                        <h6>Janje {{ forloop.counter }}</h6>
+
+                        {% if lamb_form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ lamb_form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="row g-3">
+
+                            <div class="col-md-3">
+                                <label class="form-label">Inicijalna oznaka</label>
+                                {{ lamb_form.initial_tag }}
+                                <div class="form-text">Primjer: 001</div>
+                                {% if lamb_form.initial_tag.errors %}
+                                    <div class="text-danger small">{{ lamb_form.initial_tag.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Službena markica</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">HR</span>
+                                    {{ lamb_form.official_tag }}
+                                </div>
+                                {% if lamb_form.official_tag.errors %}
+                                    <div class="text-danger small">{{ lamb_form.official_tag.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">Spol</label>
+                                {{ lamb_form.sex }}
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Datum službenog markiranja</label>
+                                {{ lamb_form.marking_date }}
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label">Napomena</label>
+                                {{ lamb_form.notes }}
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            {% endfor %}
+
+            <button class="btn btn-success">
+                Spremi janjenje
+            </button>
+
+            <a href="{% url 'lambing_list' %}" class="btn btn-outline-secondary">
+                Odustani
+            </a>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const lambCountSelect = document.getElementById("id_lamb_count");
+    const lambCards = document.querySelectorAll(".lamb-card");
+
+    function updateVisibleLambs() {
+        const selectedCount = parseInt(lambCountSelect.value);
+
+        lambCards.forEach(function (card) {
+            const index = parseInt(card.dataset.index);
+
+            if (index <= selectedCount) {
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+
+                const inputs = card.querySelectorAll("input, select, textarea");
+                inputs.forEach(function (input) {
+                    input.value = "";
+                });
+            }
+        });
+    }
+
+    lambCountSelect.addEventListener("change", updateVisibleLambs);
+    updateVisibleLambs();
+});
+</script>
+
+{% endblock %}

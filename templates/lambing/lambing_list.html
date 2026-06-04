@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Janjenja{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>Janjenja</h2>
+        <p class="text-muted mb-0">Pregled svih evidentiranih janjenja.</p>
+    </div>
+
+    <a href="{% url 'lambing_create' %}" class="btn btn-success">
+        Dodaj janjenje
+    </a>
+</div>
+
+{% if lambings %}
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+
+        <thead class="table-success">
+            <tr>
+                <th>Majka</th>
+                <th>Datum janjenja</th>
+                <th>Broj janjadi</th>
+                <th>Otac</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in lambings %}
+            <tr>
+                <td>{{ item.mother.eid_number }}</td>
+                <td>{{ item.lambing_date|date:"d.m.Y." }}</td>
+                <td>{{ item.lambs.count }}</td>
+                <td>{{ item.father|default:"-" }}</td>
+                <td class="text-end">
+                    <a href="{% url 'lambing_detail' item.pk %}"
+                       class="btn btn-sm btn-outline-success">
+                        Detalji
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+{% else %}
+
+<div class="alert alert-info">
+    Još nema evidentiranih janjenja.
+</div>
+
+{% endif %}
+
+{% endblock %}

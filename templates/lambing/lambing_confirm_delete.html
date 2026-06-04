@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Brisanje janjenja{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+
+                <h2 class="text-danger mb-3">
+                    Obriši janjenje
+                </h2>
+
+                <p>
+                    Jesi li siguran da želiš obrisati janjenje za
+                    <strong>{{ lambing.mother.eid_number }}</strong>
+                    od {{ lambing.lambing_date|date:"d.m.Y." }}?
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <button class="btn btn-danger">
+                        Da, obriši
+                    </button>
+
+                    <a href="{% url 'lambing_detail' lambing.pk %}"
+                       class="btn btn-secondary">
+                        Odustani
+                    </a>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
