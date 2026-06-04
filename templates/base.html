@@ -30,7 +30,7 @@
 
             <ul class="navbar-nav ms-auto">
 
-                <li class="nav-item">
+               <li class="nav-item">
                     <a class="nav-link" href="/">Početna</a>
                 </li>
 
@@ -45,6 +45,36 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#">Veterina</a>
                 </li>
+
+                {% if user.is_authenticated %}
+
+                <li class="nav-item">
+                    <span class="nav-link">
+                        Pozdrav, {{ user.username }}
+                    </span>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">
+                        Odjava
+                    </a>
+                </li>
+
+                {% else %}
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">
+                        Prijava
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'register' %}">
+                        Registracija
+                    </a>
+                </li>
+
+                {% endif %}
 
             </ul>
 
