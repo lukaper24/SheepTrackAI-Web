@@ -126,10 +126,12 @@ class Lamb(models.Model):
         if self.initial_tag:
             tag = self.initial_tag.strip()
 
-            if not tag.isdigit() or len(tag) != 3:
+            if not tag.isdigit() or len(tag) > 3:
                 raise ValidationError(
-                    "Inicijalna oznaka mora imati točno 3 broja, npr. 001."
+                    "Inicijalna oznaka mora imati najviše 3 broja, npr. 001."
                 )
+
+            self.initial_tag = tag.zfill(3)
 
         if self.official_tag:
             official = self.official_tag.upper().replace("HR", "").replace(" ", "")
@@ -137,6 +139,10 @@ class Lamb(models.Model):
             if not official.isdigit() or len(official) != 9:
                 raise ValidationError(
                     "Službena markica mora imati točno 9 brojeva."
+                )
+            if self.marking_date and not self.official_tag:
+                raise ValidationError(
+                    "Datum službenog markiranja ne može biti unesen bez službene markice."
                 )
 
             if not self.marking_date:

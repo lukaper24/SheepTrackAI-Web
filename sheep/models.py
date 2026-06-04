@@ -3,6 +3,8 @@ from datetime import date, timedelta
 from django.db import models
 from django.core.validators import RegexValidator
 from farms.models import Farm
+from django.core.exceptions import ValidationError
+import re
 
 
 class Sheep(models.Model):
@@ -85,11 +87,23 @@ class Sheep(models.Model):
             return 'OVNIC'
 
         return 'SILJEZICA'
+    
+    def clean(self):
+        pattern = r"^HR\s\d{9}$"
+
+        if not re.match(pattern, self.eid_number):
+            raise ValidationError({
+                "eid_number": "Životni broj mora biti u formatu HR 123456789."
+            })
 
     def save(self, *args, **kwargs):
-        self.eid_number = self.eid_number.upper().strip()
-        self.category = self.calculate_category()
-        super().save(*args, **kwargs)
+            number = self.eid_number.upper().replace("HR", "").strip()
+
+            if number.isdigit() and len(number) == 9:
+                self.eid_number = f"HR {number}"
+
+            self.full_clean()
+            super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.eid_number
+            return self.eid_number

@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Janjad{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>Janjad</h2>
+        <p class="text-muted mb-0">
+            Pregled inicijalnih oznaka, službenih markica i datuma markiranja.
+        </p>
+    </div>
+
+    <a href="{% url 'lambing_create' %}" class="btn btn-success">
+        Dodaj janjenje
+    </a>
+</div>
+
+<form method="get" class="card card-body shadow-sm border-0 mb-4">
+    <div class="row g-3">
+
+        <div class="col-md-6">
+            <label class="form-label">Pretraga</label>
+            <input type="text"
+                   name="q"
+                   class="form-control"
+                   placeholder="Inicijalna oznaka ili službena markica"
+                   value="{{ request.GET.q }}">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Status markiranja</label>
+            <select name="status" class="form-select">
+                <option value="">Sva janjad</option>
+                <option value="marked" {% if request.GET.status == "marked" %}selected{% endif %}>
+                    Službeno markirana
+                </option>
+                <option value="unmarked" {% if request.GET.status == "unmarked" %}selected{% endif %}>
+                    Nisu službeno markirana
+                </option>
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-success w-100">
+                Filtriraj
+            </button>
+        </div>
+
+    </div>
+</form>
+
+<div class="row g-3 mb-4">
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="text-success">{{ lambs.count }}</h4>
+                <p class="mb-0 text-muted">Ukupno prikazano</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% if lambs %}
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+
+        <thead class="table-success">
+            <tr>
+                <th>Inicijalna</th>
+                <th>Službena markica</th>
+                <th>Spol</th>
+                <th>Majka</th>
+                <th>Datum janjenja</th>
+                <th>Datum markiranja</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for lamb in lambs %}
+            <tr>
+                <td class="fw-semibold">{{ lamb.initial_tag }}</td>
+
+                <td class="text-nowrap">
+                    {{ lamb.official_tag|default:"-" }}
+                </td>
+
+                <td>{{ lamb.get_sex_display }}</td>
+
+                <td class="text-nowrap">
+                    {{ lamb.lambing.mother.eid_number }}
+                </td>
+
+                <td>
+                    {{ lamb.lambing.lambing_date|date:"d.m.Y." }}
+                </td>
+
+                <td>
+                    {% if lamb.official_tag and lamb.marking_date %}
+                        {{ lamb.marking_date|date:"d.m.Y." }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if lamb.official_tag %}
+                        <span class="badge bg-success">
+                            Markirano
+                        </span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">
+                            Samo inicijalno
+                        </span>
+                    {% endif %}
+                </td>
+
+                <td class="text-end">
+                    <a href="{% url 'lamb_update' lamb.pk %}"
+                       class="btn btn-sm btn-outline-success">
+                        Uredi markicu
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+{% else %}
+
+<div class="alert alert-info">
+    Nema pronađene janjadi.
+</div>
+
+{% endif %}
+
+{% endblock %}

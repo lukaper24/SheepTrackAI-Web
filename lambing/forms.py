@@ -12,6 +12,8 @@ class LambingForm(forms.ModelForm):
             "class": "form-control",
             "placeholder": "123456789",
             "inputmode": "numeric",
+            "maxlength": "9",
+            "pattern": "[0-9]{9}",
         })
     )
 
@@ -63,7 +65,8 @@ class LambForm(forms.ModelForm):
             "class": "form-control",
             "placeholder": "001",
             "inputmode": "numeric",
-            "pattern": "[0-9]{3}",
+            "pattern": "[0-9]{1,3}",
+            "maxlength": "3",
         })
     )
 
@@ -76,6 +79,7 @@ class LambForm(forms.ModelForm):
             "placeholder": "123456789",
             "inputmode": "numeric",
             "pattern": "[0-9]{9}",
+            "maxlength": "9",
         })
     )
 
@@ -107,10 +111,10 @@ class LambForm(forms.ModelForm):
         if not tag.isdigit():
             raise forms.ValidationError("Inicijalna oznaka mora sadržavati samo brojeve.")
 
-        if len(tag) != 3:
-            raise forms.ValidationError("Inicijalna oznaka mora imati točno 3 broja.")
+        if len(tag) > 3:
+            raise forms.ValidationError("Inicijalna oznaka može imati najviše 3 broja.")
 
-        return tag
+        return tag.zfill(3)
 
     def clean_official_tag(self):
         tag = self.cleaned_data.get("official_tag", "").strip()
@@ -128,15 +132,20 @@ class LambForm(forms.ModelForm):
 
         return f"HR {tag}"
 
-    def clean(self):
-        cleaned_data = super().clean()
+        def clean(self):
+            cleaned_data = super().clean()
 
-        official_tag = cleaned_data.get("official_tag")
-        marking_date = cleaned_data.get("marking_date")
+            official_tag = cleaned_data.get("official_tag")
+            marking_date = cleaned_data.get("marking_date")
 
-        if official_tag and not marking_date:
-            raise forms.ValidationError(
-                "Ako je unesena službena markica, mora biti unesen datum službenog markiranja."
-            )
+            if official_tag and not marking_date:
+                raise forms.ValidationError(
+                    "Ako je unesena službena markica, mora biti unesen datum službenog markiranja."
+                )
 
-        return cleaned_data
+            if marking_date and not official_tag:
+                raise forms.ValidationError(
+                    "Datum službenog markiranja ne može biti unesen bez službene markice."
+                )
+
+            return cleaned_data

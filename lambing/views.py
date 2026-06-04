@@ -6,6 +6,7 @@ from farms.models import Farm
 from sheep.models import Sheep
 from .forms import LambingForm, LambForm
 from .models import Lambing, Lamb
+from django.db import models
 
 
 def get_user_farm(user):
@@ -122,4 +123,67 @@ def lambing_delete(request, pk):
 
     return render(request, "lambing/lambing_confirm_delete.html", {
         "lambing": lambing,
+    })
+
+@login_required
+def lamb_list(request):
+    farm = get_user_farm(request.user)
+
+    lambs = Lamb.objects.none()
+
+    if farm:
+        lambs = Lamb.objects.filter(
+            lambing__mother__farm=farm
+        ).select_related(
+            "lambing",
+            "lambing__mother"
+        ).order_by("-lambing__lambing_date")
+
+        query = request.GET.get("q")
+        status = request.GET.get("status")
+
+        if query:
+            lambs = lambs.filter(
+                models.Q(initial_tag__icontains=query) |
+                models.Q(official_tag__icontains=query)
+            )
+
+        if status == "marked":
+            lambs = lambs.exclude(official_tag="")
+
+        if status == "unmarked":
+            lambs = lambs.filter(official_tag="")
+
+    return render(request, "lambing/lamb_list.html", {
+        "farm": farm,
+        "lambs": lambs,
+    })
+
+
+@login_required
+def lamb_update(request, pk):
+    farm = get_user_farm(request.user)
+
+    lamb = get_object_or_404(
+        Lamb,
+        pk=pk,
+        lambing__mother__farm=farm
+    )
+
+    if request.method == "POST":
+        form = LambForm(request.POST, instance=lamb)
+
+        if form.is_valid():
+            form.save()
+            return redirect("lamb_list")
+    else:
+        initial = {
+            "official_tag": lamb.official_tag.replace("HR ", "") if lamb.official_tag else ""
+        }
+
+        form = LambForm(instance=lamb, initial=initial)
+
+    return render(request, "lambing/lamb_update.html", {
+        "form": form,
+        "lamb": lamb,
     })
