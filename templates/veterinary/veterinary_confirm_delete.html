@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Brisanje veterinarskog zapisa{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+
+        <h2 class="text-danger">Obriši veterinarski zapis</h2>
+
+        <p>
+            Želiš li obrisati zapis za
+            <strong>{{ record.animal.eid_number }}</strong>?
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <button class="btn btn-danger">
+                Obriši
+            </button>
+
+            <a href="{% url 'veterinary_list' %}" class="btn btn-secondary">
+                Odustani
+            </a>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

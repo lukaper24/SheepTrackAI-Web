@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'sheep',
     'lambing',
     'veterinary',
+    'breeding',
+
 ]
 
 MIDDLEWARE = [

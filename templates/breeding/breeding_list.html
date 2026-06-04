@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Pripusti{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>Pripusti / parenja</h2>
+        <p class="text-muted mb-0">Evidencija pripusta i predviđenih datuma janjenja.</p>
+    </div>
+
+    <a href="{% url 'breeding_create' %}" class="btn btn-success">
+        Dodaj pripust
+    </a>
+</div>
+
+{% if breedings %}
+
+<table class="table table-hover align-middle">
+    <thead class="table-success">
+        <tr>
+            <th>Ovca</th>
+            <th>Ovan</th>
+            <th>Datum pripusta</th>
+            <th>Očekivano janjenje</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for item in breedings %}
+        <tr>
+            <td>{{ item.ewe.eid_number }}</td>
+            <td>
+                {% if item.ram %}
+                    {{ item.ram.eid_number }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>{{ item.breeding_date|date:"d.m.Y." }}</td>
+            <td>
+                <span class="badge bg-warning text-dark">
+                    {{ item.expected_lambing_date|date:"d.m.Y." }}
+                </span>
+            </td>
+            <td class="text-end">
+                <a href="{% url 'breeding_delete' item.pk %}" class="btn btn-sm btn-outline-danger">
+                    Obriši
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% else %}
+
+<div class="alert alert-info">
+    Nema evidentiranih pripusta.
+</div>
+
+{% endif %}
+
+{% endblock %}

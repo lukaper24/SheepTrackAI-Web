@@ -44,9 +44,12 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'lamb_list' %}">Janjad</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'breeding_list' %}">Pripusti</a>
+                </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Veterina</a>
+                    <a class="nav-link" href="{% url 'veterinary_list' %}">Veterina</a>
                 </li>
 
                 {% if user.is_authenticated %}

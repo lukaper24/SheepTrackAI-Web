@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Dodaj pripust{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+
+        <h2 class="text-success mb-4">Dodaj pripust</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="form-label">Ovca</label>
+                    {{ form.ewe }}
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Ovan</label>
+                    {{ form.ram }}
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Datum pripusta</label>
+                    {{ form.breeding_date }}
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Napomena</label>
+                    {{ form.notes }}
+                </div>
+
+            </div>
+
+            <button class="btn btn-success mt-4">
+                Spremi
+            </button>
+
+            <a href="{% url 'breeding_list' %}" class="btn btn-outline-secondary mt-4">
+                Odustani
+            </a>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

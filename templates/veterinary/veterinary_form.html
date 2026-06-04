@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Dodaj veterinarski zapis{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+
+        <h2 class="text-success mb-4">Dodaj veterinarski zapis</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="row g-3">
+                {% for field in form %}
+                    <div class="col-md-6">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="text-danger small">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button class="btn btn-success mt-4">
+                Spremi
+            </button>
+
+            <a href="{% url 'veterinary_list' %}" class="btn btn-outline-secondary mt-4">
+                Odustani
+            </a>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}
