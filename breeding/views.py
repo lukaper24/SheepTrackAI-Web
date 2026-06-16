@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -9,6 +11,17 @@ from .forms import BreedingForm
 
 def get_user_farm(user):
     return Farm.objects.filter(owner=user).first()
+
+
+def get_available_rams(farm):
+    nine_months_ago = date.today() - timedelta(days=274)
+
+    return Sheep.objects.filter(
+        farm=farm,
+        sex="M",
+        status="ACTIVE",
+        birth_date__lte=nine_months_ago
+    )
 
 
 @login_required
@@ -34,18 +47,19 @@ def breeding_create(request):
     if not farm:
         return redirect("farm_list")
 
+    ewes = Sheep.objects.filter(
+        farm=farm,
+        sex="Z",
+        status="ACTIVE"
+    )
+
+    rams = get_available_rams(farm)
+
     if request.method == "POST":
         form = BreedingForm(request.POST)
 
-        form.fields["ewe"].queryset = Sheep.objects.filter(
-            farm=farm,
-            sex="Z"
-        )
-
-        form.fields["ram"].queryset = Sheep.objects.filter(
-            farm=farm,
-            sex="M"
-        )
+        form.fields["ewe"].queryset = ewes
+        form.fields["ram"].queryset = rams
 
         if form.is_valid():
             form.save()
@@ -54,17 +68,12 @@ def breeding_create(request):
     else:
         form = BreedingForm()
 
-        form.fields["ewe"].queryset = Sheep.objects.filter(
-            farm=farm,
-            sex="Z"
-        )
+        form.fields["ewe"].queryset = ewes
+        form.fields["ram"].queryset = rams
 
-        form.fields["ram"].queryset = Sheep.objects.filter(
-            farm=farm,
-            sex="M"
-        )
-
-    return render(request, "breeding/breeding_form.html", {"form": form})
+    return render(request, "breeding/breeding_form.html", {
+        "form": form
+    })
 
 
 @login_required

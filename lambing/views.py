@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.forms import modelformset_factory
 from django.shortcuts import render, redirect, get_object_or_404
@@ -10,7 +11,7 @@ from sheep.models import Sheep
 
 from .forms import LambingForm, LambForm
 from .models import Lambing, Lamb
-from django.core.exceptions import ValidationError
+
 
 def get_user_farm(user):
     return Farm.objects.filter(owner=user).first()
@@ -56,10 +57,15 @@ def lambing_create(request):
         status="ACTIVE"
     )
 
+    # Otac kod janjenja mora biti dovoljno star:
+    # 9 mjeseci za pripust + oko 5 mjeseci skotnosti = cca 424 dana.
+    father_min_birth_date = date.today() - timedelta(days=424)
+
     fathers = Sheep.objects.filter(
         farm=farm,
         sex="M",
-        status="ACTIVE"
+        status="ACTIVE",
+        birth_date__lte=father_min_birth_date
     )
 
     mother_breeds = {

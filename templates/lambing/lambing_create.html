@@ -4,157 +4,178 @@
 
 {% block content %}
 
-<div class="card shadow-sm border-0">
-    <div class="card-body p-4">
+<div class="row justify-content-center">
+    <div class="col-lg-10">
 
-        <h2 class="text-success mb-4">Dodaj janjenje</h2>
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
 
-        <form method="post">
-            
-            {% csrf_token %}
+                <h2 class="text-success mb-4">Dodaj janjenje</h2>
 
-            {% if form.non_field_errors %}
-                <div class="alert alert-danger">
-                    {{ form.non_field_errors }}
-                </div>
-            {% endif %}
+                <form method="post">
+                    {% csrf_token %}
 
-            {% for field in form %}
-                {% if field.errors %}
-                    <div class="alert alert-danger">
-                        <strong>{{ field.label }}:</strong>
-                        {{ field.errors }}
-                    </div>
-                {% endif %}
-            {% endfor %}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
 
-            {% if formset.non_form_errors %}
-                <div class="alert alert-danger">
-                    {{ formset.non_form_errors }}
-                </div>
-            {% endif %}
-
-            <div class="row g-3">
-
-                <div class="col-md-3">
-                    <label class="form-label">Majka</label>
-                    {{ form.mother }}
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Datum janjenja</label>
-                    {{ form.lambing_date }}
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Broj janjadi</label>
-                    {{ form.lamb_count }}
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Otac iz stada</label>
-                    {{ form.father_sheep }}
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Otac / ovan izvan stada</label>
-                    <div class="input-group">
-                        <span class="input-group-text">HR</span>
-                        {{ form.father }}
-                    </div>
-                    <div class="form-text">Ako nije iz tvog stada, unesi 9 brojeva.</div>
-                </div>
-
-                <div class="col-12">
-                    <label class="form-label">Napomena</label>
-                    {{ form.notes }}
-                </div>
-
-            </div>
-
-            <hr class="my-4">
-
-            <h4 class="mb-3">Janjad</h4>
-
-            <p class="text-muted">
-                Ako su otac i majka iste pasmine, aplikacija automatski popunjava pasminu janjeta.
-                Ako nisu, možeš ručno odabrati pasminu.
-            </p>
-
-            {{ formset.management_form }}
-
-            {% for lamb_form in formset %}
-                <div class="card mb-3 border-0 bg-light lamb-card" data-index="{{ forloop.counter }}">
-                    <div class="card-body">
-
-                        <h6>Janje {{ forloop.counter }}</h6>
-
-                        {% if lamb_form.non_field_errors %}
+                    {% for field in form %}
+                        {% if field.errors %}
                             <div class="alert alert-danger">
-                                {{ lamb_form.non_field_errors }}
+                                <strong>{{ field.label }}:</strong>
+                                {{ field.errors }}
                             </div>
                         {% endif %}
+                    {% endfor %}
 
-                        {% for field in lamb_form %}
-                            {% if field.errors %}
-                                <div class="alert alert-danger">
-                                    <strong>{{ field.label }}:</strong>
-                                    {{ field.errors }}
-                                </div>
-                            {% endif %}
-                        {% endfor %}
+                    {% if formset.non_form_errors %}
+                        <div class="alert alert-danger">
+                            {{ formset.non_form_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-4">
+                        <h5 class="text-success mb-3">Podaci o janjenju</h5>
 
                         <div class="row g-3">
 
-                            <div class="col-md-2">
-                                <label class="form-label">Inicijalna oznaka</label>
-                                {{ lamb_form.initial_tag }}
-                                <div class="form-text">Primjer: 001</div>
+                            <div class="col-md-3">
+                                <label class="form-label">Majka</label>
+                                {{ form.mother }}
                             </div>
 
                             <div class="col-md-3">
-                                <label class="form-label">Službena markica</label>
+                                <label class="form-label">Datum janjenja</label>
+                                {{ form.lambing_date }}
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Broj janjadi</label>
+                                {{ form.lamb_count }}
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Otac iz stada</label>
+                                {{ form.father_sheep }}
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Otac / ovan izvan stada</label>
                                 <div class="input-group">
                                     <span class="input-group-text">HR</span>
-                                    {{ lamb_form.official_tag }}
+                                    {{ form.father }}
                                 </div>
+                                <div class="form-text">Ako nije iz tvog stada, unesi 9 brojeva.</div>
                             </div>
 
-                            <div class="col-md-2">
-                                <label class="form-label">Spol</label>
-                                {{ lamb_form.sex }}
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label">Pasmina</label>
-                                {{ lamb_form.breed }}
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="form-label">Datum službenog markiranja</label>
-                                {{ lamb_form.marking_date }}
-                            </div>
-
-                            <div class="col-md-12">
+                            <div class="col-md-8">
                                 <label class="form-label">Napomena</label>
-                                {{ lamb_form.notes }}
+                                {{ form.notes }}
                             </div>
 
                         </div>
-
                     </div>
-                </div>
-            {% endfor %}
 
-            <button class="btn btn-success">
-                Spremi janjenje
-            </button>
+                    <hr class="my-4">
 
-            <a href="{% url 'lambing_list' %}" class="btn btn-outline-secondary">
-                Odustani
-            </a>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <h5 class="text-success mb-1">Janjad</h5>
+                            <p class="text-muted mb-0">
+                                Unesi podatke za svako janje iz ovog janjenja.
+                            </p>
+                        </div>
+                    </div>
 
-        </form>
+                    <div class="alert alert-light border mb-4">
+                        Ako su otac i majka iste pasmine, aplikacija automatski popunjava pasminu janjeta.
+                        Ako nisu, pasminu možeš ručno odabrati.
+                    </div>
+
+                    {{ formset.management_form }}
+
+                    {% for lamb_form in formset %}
+                        <div class="card mb-3 border shadow-sm lamb-card" data-index="{{ forloop.counter }}">
+                            <div class="card-body">
+
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="text-success mb-0">Janje {{ forloop.counter }}</h6>
+                                    <span class="badge bg-light text-dark border">Podaci o janjetu</span>
+                                </div>
+
+                                {% if lamb_form.non_field_errors %}
+                                    <div class="alert alert-danger">
+                                        {{ lamb_form.non_field_errors }}
+                                    </div>
+                                {% endif %}
+
+                                {% for field in lamb_form %}
+                                    {% if field.errors %}
+                                        <div class="alert alert-danger">
+                                            <strong>{{ field.label }}:</strong>
+                                            {{ field.errors }}
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+
+                                <div class="row g-3 align-items-start">
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Inicijalna oznaka</label>
+                                        {{ lamb_form.initial_tag }}
+                                        <div class="form-text">Primjer: 001</div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Službena markica</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">HR</span>
+                                            {{ lamb_form.official_tag }}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Spol</label>
+                                        {{ lamb_form.sex }}
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Pasmina</label>
+                                        {{ lamb_form.breed }}
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Datum markiranja</label>
+                                        {{ lamb_form.marking_date }}
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label">Napomena</label>
+                                        {{ lamb_form.notes }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button class="btn btn-success">
+                            Spremi janjenje
+                        </button>
+
+                        <a href="{% url 'lambing_list' %}" class="btn btn-outline-secondary">
+                            Odustani
+                        </a>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
 
     </div>
 </div>

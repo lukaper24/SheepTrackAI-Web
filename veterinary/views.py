@@ -44,18 +44,25 @@ def veterinary_create(request):
     if not farm:
         return redirect("farm_list")
 
+    animals = Sheep.objects.filter(
+        farm=farm,
+        status="ACTIVE"
+    ).order_by("eid_number")
+
     if request.method == "POST":
         form = VeterinaryRecordForm(request.POST)
-        form.fields["animal"].queryset = Sheep.objects.filter(farm=farm)
+        form.fields["animal"].queryset = animals
 
         if form.is_valid():
             form.save()
             return redirect("veterinary_list")
     else:
         form = VeterinaryRecordForm()
-        form.fields["animal"].queryset = Sheep.objects.filter(farm=farm)
+        form.fields["animal"].queryset = animals
 
-    return render(request, "veterinary/veterinary_form.html", {"form": form})
+    return render(request, "veterinary/veterinary_form.html", {
+        "form": form
+    })
 
 
 @login_required

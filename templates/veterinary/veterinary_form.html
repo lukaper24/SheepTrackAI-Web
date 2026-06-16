@@ -12,16 +12,65 @@
         <form method="post">
             {% csrf_token %}
 
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
             <div class="row g-3">
-                {% for field in form %}
-                    <div class="col-md-6">
-                        <label class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <div class="text-danger small">{{ field.errors }}</div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
+
+                <div class="col-md-6">
+                    <label class="form-label">Grlo</label>
+                    {{ form.animal }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Vrsta zapisa</label>
+                    {{ form.record_type }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Datum</label>
+                    {{ form.date }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Naziv</label>
+                    {{ form.title }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Lijek / cjepivo</label>
+                    {{ form.medicine }}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Tko je izvršio?</label>
+                    {{ form.performed_by }}
+                </div>
+
+                <div class="col-md-6" id="vet-name-wrapper">
+                    <label class="form-label">Ime veterinara</label>
+                    {{ form.vet_name }}
+
+                    {% if form.vet_name.errors %}
+                        <div class="text-danger small">
+                            {{ form.vet_name.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Karenca u danima</label>
+                    {{ form.withdrawal_period }}
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Napomena</label>
+                    {{ form.notes }}
+                </div>
+
             </div>
 
             <button class="btn btn-success mt-4">
@@ -36,5 +85,29 @@
 
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const performedBy = document.getElementById("id_performed_by");
+    const vetWrapper = document.getElementById("vet-name-wrapper");
+    const vetInput = document.getElementById("id_vet_name");
+
+    function toggleVetName() {
+        if (!performedBy || !vetWrapper || !vetInput) {
+            return;
+        }
+
+        if (performedBy.value === "VET") {
+            vetWrapper.style.display = "block";
+        } else {
+            vetWrapper.style.display = "none";
+            vetInput.value = "";
+        }
+    }
+
+    performedBy.addEventListener("change", toggleVetName);
+    toggleVetName();
+});
+</script>
 
 {% endblock %}
