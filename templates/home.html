@@ -81,6 +81,20 @@
 
 </div>
 
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h4 class="mb-3">AJAX / JSON status sustava</h4>
+
+        <p class="text-muted">
+            Ovi podaci dohvaćaju se dinamički pomoću JavaScript Fetch API-ja iz Django JSON endpointa.
+        </p>
+
+        <div id="api-stats-box" class="alert alert-info">
+            Učitavam podatke iz API-ja...
+        </div>
+    </div>
+</div>
+
 <div class="row g-4">
 
     <div class="col-md-7">
@@ -153,17 +167,22 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{{ chart_labels|json_script:"chart-labels-data" }}
+{{ chart_data|json_script:"chart-data-data" }}
 
 <script>
+const labels = JSON.parse(document.getElementById("chart-labels-data").textContent);
+const chartData = JSON.parse(document.getElementById("chart-data-data").textContent);
+
 const ctx = document.getElementById("lambingChart");
 
 new Chart(ctx, {
     type: "bar",
     data: {
-        labels: {{ chart_labels|safe }},
+        labels: labels,
         datasets: [{
             label: "Broj janjenja",
-            data: {{ chart_data|safe }},
+            data: chartData,
             borderWidth: 1
         }]
     },
@@ -178,6 +197,34 @@ new Chart(ctx, {
             }
         }
     }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const box = document.getElementById("api-stats-box");
+
+    if (!box) {
+        return;
+    }
+
+    fetch("{% url 'api_dashboard_stats' %}")
+        .then(response => response.json())
+        .then(data => {
+            box.innerHTML = `
+                <strong>JSON API odgovor:</strong><br>
+                Aktivna grla: ${data.active_sheep}<br>
+                Ukupno grla: ${data.total_sheep}<br>
+                Janjenja: ${data.lambings}<br>
+                Janjad: ${data.lambs}<br>
+                Veterinarski zapisi: ${data.veterinary_records}<br>
+                Vaganja: ${data.weights}
+            `;
+        })
+        .catch(error => {
+            box.className = "alert alert-danger";
+            box.innerText = "Greška kod dohvaćanja API podataka.";
+        });
 });
 </script>
 
