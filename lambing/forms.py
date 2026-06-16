@@ -132,20 +132,20 @@ class LambForm(forms.ModelForm):
 
         return f"HR {tag}"
 
-        def clean(self):
-            cleaned_data = super().clean()
+    def clean(self):
+        cleaned_data = super().clean()
 
-            official_tag = cleaned_data.get("official_tag")
-            marking_date = cleaned_data.get("marking_date")
+        official_tag = cleaned_data.get("official_tag")
+        marking_date = cleaned_data.get("marking_date")
 
-            if official_tag and not marking_date:
-                raise forms.ValidationError(
-                    "Ako je unesena službena markica, mora biti unesen datum službenog markiranja."
-                )
+        if official_tag and not marking_date:
+            raise forms.ValidationError(
+                "Ako je unesena službena markica, mora biti unesen datum službenog markiranja."
+            )
 
-            if marking_date and not official_tag:
-                raise forms.ValidationError(
-                    "Datum službenog markiranja ne može biti unesen bez službene markice."
-                )
+        if marking_date and not official_tag:
+            raise forms.ValidationError(
+                "Datum službenog markiranja ne može biti unesen bez službene markice."
+            )
 
-            return cleaned_data
+        return cleaned_data
