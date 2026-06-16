@@ -86,3 +86,11 @@ class SheepExitForm(forms.ModelForm):
                     "placeholder": "Razlog, kupac, napomena..."
                 }),
             }
+class SheepImportForm(forms.Form):
+    pdf_file = forms.FileField(
+        label="PDF iz e-Posjednika",
+        widget=forms.FileInput(attrs={
+            "class": "form-control",
+            "accept": ".pdf"
+        })
+    )
