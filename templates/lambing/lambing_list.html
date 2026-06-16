@@ -33,10 +33,28 @@
         <tbody>
             {% for item in lambings %}
             <tr>
-                <td>{{ item.mother.eid_number }}</td>
-                <td>{{ item.lambing_date|date:"d.m.Y." }}</td>
-                <td>{{ item.lambs.count }}</td>
-                <td>{{ item.father|default:"-" }}</td>
+                <td class="text-nowrap">
+                    {{ item.mother.eid_number }}
+                </td>
+
+                <td>
+                    {{ item.lambing_date|date:"d.m.Y." }}
+                </td>
+
+                <td>
+                    {{ item.lamb_count }}
+                </td>
+
+                <td class="text-nowrap">
+                    {% if item.father_sheep %}
+                        {{ item.father_sheep.eid_number }}
+                    {% elif item.father %}
+                        {{ item.father }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+
                 <td class="text-end">
                     <a href="{% url 'lambing_detail' item.pk %}"
                        class="btn btn-sm btn-outline-success">

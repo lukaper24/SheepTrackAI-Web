@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}Dodaj ovcu{% endblock %}
+{% block title %}
+    {% if edit_mode %}Uredi grlo{% else %}Dodaj grlo{% endif %}
+{% endblock %}
 
 {% block content %}
 
@@ -11,16 +13,24 @@
             <div class="card-body p-4">
 
                 <h2 class="mb-4 text-success">
-                    Dodaj grlo
+                    {% if edit_mode %}
+                        Uredi grlo
+                    {% else %}
+                        Dodaj grlo
+                    {% endif %}
                 </h2>
 
                 <form method="post">
                     {% csrf_token %}
 
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
                     <div class="mb-3">
-                        <label class="form-label">
-                            Životni broj
-                        </label>
+                        <label class="form-label">Životni broj</label>
 
                         <div class="input-group">
                             <span class="input-group-text">HR</span>
@@ -53,11 +63,13 @@
                         {{ form.birth_date }}
                     </div>
 
-                    <div class="form-check mb-3">
-                        {{ form.is_breeding_ram }}
-                        <label class="form-check-label">
-                            Rasplodni ovan
-                        </label>
+                    <div class="mb-3" id="breeding-ram-wrapper">
+                        <div class="form-check">
+                            {{ form.is_breeding_ram }}
+                            <label class="form-check-label">
+                                Rasplodni ovan
+                            </label>
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -80,5 +92,29 @@
 
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const sexField = document.getElementById("id_sex");
+    const ramWrapper = document.getElementById("breeding-ram-wrapper");
+    const ramCheckbox = document.getElementById("id_is_breeding_ram");
+
+    function toggleRamField() {
+        if (!sexField || !ramWrapper || !ramCheckbox) {
+            return;
+        }
+
+        if (sexField.value === "M") {
+            ramWrapper.style.display = "block";
+        } else {
+            ramWrapper.style.display = "none";
+            ramCheckbox.checked = false;
+        }
+    }
+
+    sexField.addEventListener("change", toggleRamField);
+    toggleRamField();
+});
+</script>
 
 {% endblock %}

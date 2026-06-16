@@ -7,6 +7,8 @@ from farms.models import Farm
 from sheep.models import Sheep
 from lambing.models import Lambing, Lamb
 
+from django.http import JsonResponse
+
 
 @login_required
 def home(request):
@@ -72,3 +74,39 @@ def home(request):
         "chart_labels": chart_labels,
         "chart_data": chart_data,
     })
+
+def about(request):
+    return render(request, "about.html")
+
+
+def api_dashboard_stats(request):
+    farm = Farm.objects.filter(owner=request.user).first()
+
+    data = {
+        "total_sheep": 0,
+        "active_sheep": 0,
+        "lambings": 0,
+        "lambs": 0,
+        "veterinary_records": 0,
+        "weights": 0,
+    }
+
+    if request.user.is_authenticated and farm:
+        from lambing.models import Lambing, Lamb
+        from veterinary.models import VeterinaryRecord
+        from weights.models import WeightRecord
+        from sheep.models import Sheep
+
+        data = {
+            "total_sheep": Sheep.objects.filter(farm=farm).count(),
+            "active_sheep": Sheep.objects.filter(farm=farm, status="ACTIVE").count(),
+            "lambings": Lambing.objects.filter(mother__farm=farm).count(),
+            "lambs": Lamb.objects.filter(lambing__mother__farm=farm).count(),
+            "veterinary_records": VeterinaryRecord.objects.filter(animal__farm=farm).count(),
+            "weights": (
+                WeightRecord.objects.filter(sheep__farm=farm).count()
+                + WeightRecord.objects.filter(lamb__lambing__mother__farm=farm).count()
+            ),
+        }
+
+    return JsonResponse(data)

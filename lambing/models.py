@@ -14,14 +14,21 @@ class Lambing(models.Model):
         verbose_name="Majka"
     )
 
-    lambing_date = models.DateField(
-        verbose_name="Datum janjenja"
+    lambing_date = models.DateField(verbose_name="Datum janjenja")
+
+    father_sheep = models.ForeignKey(
+        Sheep,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="fathered_lambings",
+        verbose_name="Otac iz stada"
     )
 
     father = models.CharField(
         max_length=12,
         blank=True,
-        verbose_name="Otac / ovan"
+        verbose_name="Otac / ovan izvan stada"
     )
 
     lamb_count = models.PositiveSmallIntegerField(
@@ -36,11 +43,7 @@ class Lambing(models.Model):
         default=1
     )
 
-    notes = models.TextField(
-        blank=True,
-        verbose_name="Napomena"
-    )
-
+    notes = models.TextField(blank=True, verbose_name="Napomena")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def clean(self):
@@ -59,9 +62,10 @@ class Lambing(models.Model):
             for item in existing_lambings:
                 difference = abs((self.lambing_date - item.lambing_date).days)
 
-                if difference < 180:
+                if 0 < difference < 180:
                     raise ValidationError(
-                        "Za istu ovcu ne može se unijeti novo janjenje unutar 180 dana."
+                        "Za istu ovcu ne može se unijeti novo janjenje unutar 180 dana. "
+                        "Ako je janjenje isti dan, možeš naknadno dodati janje za isti datum."
                     )
 
     def save(self, *args, **kwargs):
@@ -79,7 +83,6 @@ class Lambing(models.Model):
 
 
 class Lamb(models.Model):
-
     SEX_CHOICES = [
         ("Z", "Žensko"),
         ("M", "Muško"),
@@ -92,10 +95,7 @@ class Lamb(models.Model):
         verbose_name="Janjenje"
     )
 
-    initial_tag = models.CharField(
-        max_length=3,
-        verbose_name="Inicijalna oznaka"
-    )
+    initial_tag = models.CharField(max_length=3, verbose_name="Inicijalna oznaka")
 
     official_tag = models.CharField(
         max_length=12,
@@ -109,16 +109,20 @@ class Lamb(models.Model):
         verbose_name="Spol"
     )
 
+    breed = models.CharField(
+        max_length=50,
+        choices=Sheep.BREED_CHOICES,
+        blank=True,
+        verbose_name="Pasmina janjeta"
+    )
+
     marking_date = models.DateField(
         null=True,
         blank=True,
         verbose_name="Datum službenog markiranja"
     )
 
-    notes = models.TextField(
-        blank=True,
-        verbose_name="Napomena"
-    )
+    notes = models.TextField(blank=True, verbose_name="Napomena")
 
     converted_sheep = models.OneToOneField(
         Sheep,
@@ -165,6 +169,15 @@ class Lamb(models.Model):
             official = self.official_tag.upper().replace("HR", "").replace(" ", "").strip()
             self.official_tag = f"HR {official}"
 
+        if not self.breed and self.lambing_id:
+            mother = self.lambing.mother
+            father = self.lambing.father_sheep
+
+            if father and father.breed == mother.breed:
+                self.breed = mother.breed
+            else:
+                self.breed = mother.breed
+
         self.full_clean()
         super().save(*args, **kwargs)
 
@@ -175,7 +188,7 @@ class Lamb(models.Model):
                 eid_number=self.official_tag,
                 defaults={
                     "farm": mother.farm,
-                    "breed": mother.breed,
+                    "breed": self.breed,
                     "sex": self.sex,
                     "birth_date": self.lambing.lambing_date,
                     "is_breeding_ram": False,

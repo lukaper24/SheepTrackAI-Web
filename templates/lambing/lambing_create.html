@@ -10,6 +10,7 @@
         <h2 class="text-success mb-4">Dodaj janjenje</h2>
 
         <form method="post">
+            
             {% csrf_token %}
 
             {% if form.non_field_errors %}
@@ -18,9 +19,18 @@
                 </div>
             {% endif %}
 
-            {% if form.errors %}
-                <div class="alert alert-warning">
-                    Provjeri unesene podatke. Neka pravila janjenja nisu zadovoljena.
+            {% for field in form %}
+                {% if field.errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ field.label }}:</strong>
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            {% if formset.non_form_errors %}
+                <div class="alert alert-danger">
+                    {{ formset.non_form_errors }}
                 </div>
             {% endif %}
 
@@ -39,21 +49,20 @@
                 <div class="col-md-3">
                     <label class="form-label">Broj janjadi</label>
                     {{ form.lamb_count }}
-                    {% if form.lamb_count.errors %}
-                        <div class="text-danger small">{{ form.lamb_count.errors }}</div>
-                    {% endif %}
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label">Otac / ovan</label>
+                    <label class="form-label">Otac iz stada</label>
+                    {{ form.father_sheep }}
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Otac / ovan izvan stada</label>
                     <div class="input-group">
                         <span class="input-group-text">HR</span>
                         {{ form.father }}
                     </div>
-                    <div class="form-text">Unesi samo 9 brojeva.</div>
-                    {% if form.father.errors %}
-                        <div class="text-danger small">{{ form.father.errors }}</div>
-                    {% endif %}
+                    <div class="form-text">Ako nije iz tvog stada, unesi 9 brojeva.</div>
                 </div>
 
                 <div class="col-12">
@@ -68,8 +77,8 @@
             <h4 class="mb-3">Janjad</h4>
 
             <p class="text-muted">
-                Za svako janje obavezno unesi inicijalnu oznaku od 3 broja.
-                Službena markica može se dodati odmah ili naknadno.
+                Ako su otac i majka iste pasmine, aplikacija automatski popunjava pasminu janjeta.
+                Ako nisu, možeš ručno odabrati pasminu.
             </p>
 
             {{ formset.management_form }}
@@ -86,15 +95,21 @@
                             </div>
                         {% endif %}
 
+                        {% for field in lamb_form %}
+                            {% if field.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ field.label }}:</strong>
+                                    {{ field.errors }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
                         <div class="row g-3">
 
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Inicijalna oznaka</label>
                                 {{ lamb_form.initial_tag }}
                                 <div class="form-text">Primjer: 001</div>
-                                {% if lamb_form.initial_tag.errors %}
-                                    <div class="text-danger small">{{ lamb_form.initial_tag.errors }}</div>
-                                {% endif %}
                             </div>
 
                             <div class="col-md-3">
@@ -103,14 +118,16 @@
                                     <span class="input-group-text">HR</span>
                                     {{ lamb_form.official_tag }}
                                 </div>
-                                {% if lamb_form.official_tag.errors %}
-                                    <div class="text-danger small">{{ lamb_form.official_tag.errors }}</div>
-                                {% endif %}
                             </div>
 
                             <div class="col-md-2">
                                 <label class="form-label">Spol</label>
                                 {{ lamb_form.sex }}
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Pasmina</label>
+                                {{ lamb_form.breed }}
                             </div>
 
                             <div class="col-md-3">
@@ -142,10 +159,19 @@
     </div>
 </div>
 
+{{ mother_breeds|json_script:"mother-breeds-data" }}
+{{ father_breeds|json_script:"father-breeds-data" }}
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const lambCountSelect = document.getElementById("id_lamb_count");
     const lambCards = document.querySelectorAll(".lamb-card");
+
+    const motherSelect = document.getElementById("id_mother");
+    const fatherSelect = document.getElementById("id_father_sheep");
+
+    const motherBreeds = JSON.parse(document.getElementById("mother-breeds-data").textContent);
+    const fatherBreeds = JSON.parse(document.getElementById("father-breeds-data").textContent);
 
     function updateVisibleLambs() {
         const selectedCount = parseInt(lambCountSelect.value);
@@ -158,7 +184,7 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 card.style.display = "none";
 
-                const inputs = card.querySelectorAll("input, select, textarea");
+                const inputs = card.querySelectorAll("input, textarea");
                 inputs.forEach(function (input) {
                     input.value = "";
                 });
@@ -166,8 +192,32 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    function autoFillBreedIfSameParents() {
+        const motherId = motherSelect.value;
+        const fatherId = fatherSelect.value;
+
+        if (!motherId || !fatherId) {
+            return;
+        }
+
+        const motherBreed = motherBreeds[motherId];
+        const fatherBreed = fatherBreeds[fatherId];
+
+        if (motherBreed && fatherBreed && motherBreed === fatherBreed) {
+            const breedSelects = document.querySelectorAll(".lamb-breed-select");
+
+            breedSelects.forEach(function (select) {
+                select.value = motherBreed;
+            });
+        }
+    }
+
     lambCountSelect.addEventListener("change", updateVisibleLambs);
+    motherSelect.addEventListener("change", autoFillBreedIfSameParents);
+    fatherSelect.addEventListener("change", autoFillBreedIfSameParents);
+
     updateVisibleLambs();
+    autoFillBreedIfSameParents();
 });
 </script>
 

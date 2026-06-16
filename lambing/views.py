@@ -1,13 +1,16 @@
+from datetime import date, timedelta
+
 from django.contrib.auth.decorators import login_required
+from django.db import models
 from django.forms import modelformset_factory
 from django.shortcuts import render, redirect, get_object_or_404
 
 from farms.models import Farm
 from sheep.models import Sheep
+
 from .forms import LambingForm, LambForm
 from .models import Lambing, Lamb
-from django.db import models
-
+from django.core.exceptions import ValidationError
 
 def get_user_farm(user):
     return Farm.objects.filter(owner=user).first()
@@ -22,6 +25,9 @@ def lambing_list(request):
     if farm:
         lambings = Lambing.objects.filter(
             mother__farm=farm
+        ).select_related(
+            "mother",
+            "father_sheep"
         ).order_by("-lambing_date")
 
     return render(request, "lambing/lambing_list.html", {
@@ -44,18 +50,48 @@ def lambing_create(request):
         can_delete=False
     )
 
+    mothers = Sheep.objects.filter(
+        farm=farm,
+        sex="Z",
+        status="ACTIVE"
+    )
+
+    fathers = Sheep.objects.filter(
+        farm=farm,
+        sex="M",
+        status="ACTIVE"
+    )
+
+    mother_breeds = {
+        str(sheep.id): sheep.breed
+        for sheep in mothers
+    }
+
+    father_breeds = {
+        str(sheep.id): sheep.breed
+        for sheep in fathers
+    }
+
     if request.method == "POST":
         form = LambingForm(request.POST)
-        form.fields["mother"].queryset = Sheep.objects.filter(
-            farm=farm,
-            sex="Z"
-        )
+        form.fields["mother"].queryset = mothers
+        form.fields["father_sheep"].queryset = fathers
 
         formset = LambFormSet(request.POST, queryset=Lamb.objects.none())
 
         if form.is_valid() and formset.is_valid():
             lambing = form.save(commit=False)
-            lambing.save()
+
+            try:
+                lambing.save()
+            except ValidationError as error:
+                form.add_error(None, error)
+                return render(request, "lambing/lambing_create.html", {
+                    "form": form,
+                    "formset": formset,
+                    "mother_breeds": mother_breeds,
+                    "father_breeds": father_breeds,
+                })
 
             saved_lambs = 0
 
@@ -80,17 +116,18 @@ def lambing_create(request):
 
     else:
         form = LambingForm()
-        form.fields["mother"].queryset = Sheep.objects.filter(
-            farm=farm,
-            sex="Z"
-        )
+        form.fields["mother"].queryset = mothers
+        form.fields["father_sheep"].queryset = fathers
 
         formset = LambFormSet(queryset=Lamb.objects.none())
 
     return render(request, "lambing/lambing_create.html", {
         "form": form,
         "formset": formset,
+        "mother_breeds": mother_breeds,
+        "father_breeds": father_breeds,
     })
+
 
 @login_required
 def lambing_detail(request, pk):
@@ -125,6 +162,7 @@ def lambing_delete(request, pk):
         "lambing": lambing,
     })
 
+
 @login_required
 def lamb_list(request):
     farm = get_user_farm(request.user)
@@ -132,11 +170,17 @@ def lamb_list(request):
     lambs = Lamb.objects.none()
 
     if farm:
+        six_months_ago = date.today() - timedelta(days=183)
+
         lambs = Lamb.objects.filter(
             lambing__mother__farm=farm
+        ).filter(
+            models.Q(official_tag="") |
+            models.Q(lambing__lambing_date__gt=six_months_ago)
         ).select_related(
             "lambing",
-            "lambing__mother"
+            "lambing__mother",
+            "converted_sheep"
         ).order_by("-lambing__lambing_date")
 
         query = request.GET.get("q")

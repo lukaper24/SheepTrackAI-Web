@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}O aplikaciji | SheepTrackAI{% endblock %}
+
+{% block content %}
+
+<h1 class="text-success mb-4">O aplikaciji i literatura</h1>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h4>SheepTrackAI Web</h4>
+
+        <p>
+            SheepTrackAI je web aplikacija za digitalno vođenje evidencije ovčarske farme.
+            Aplikacija omogućuje upravljanje OPG-om, grlima, janjenjima, janjadi,
+            pripustima, veterinarskim zapisima, vaganjima i arhivom grla.
+        </p>
+
+        <p>
+            Sustav koristi Django backend, lokalnu SQLite bazu podataka, Bootstrap dizajn
+            i JavaScript za dinamičke dijelove korisničkog sučelja.
+        </p>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h4>Korištene tehnologije</h4>
+
+        <ul>
+            <li>Python</li>
+            <li>Django</li>
+            <li>SQLite baza podataka</li>
+            <li>HTML</li>
+            <li>CSS</li>
+            <li>Bootstrap 5</li>
+            <li>JavaScript</li>
+            <li>AJAX / Fetch API</li>
+            <li>JSON</li>
+            <li>Git i GitHub</li>
+        </ul>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h4>JSON API</h4>
+
+        <p>
+            Aplikacija sadrži vlastiti Django API endpoint koji vraća statistiku aplikacije
+            u JSON formatu. Frontend dohvaća podatke pomoću JavaScript Fetch API-ja.
+        </p>
+
+        <a href="{% url 'api_dashboard_stats' %}" class="btn btn-outline-success" target="_blank">
+            Otvori JSON API
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <h4>Literatura i izvori</h4>
+
+        <ul>
+            <li>Django dokumentacija: https://docs.djangoproject.com/</li>
+            <li>Python dokumentacija: https://docs.python.org/</li>
+            <li>Bootstrap dokumentacija: https://getbootstrap.com/</li>
+            <li>MDN Web Docs: https://developer.mozilla.org/</li>
+            <li>Chart.js dokumentacija: https://www.chartjs.org/</li>
+            <li>Materijali s predavanja iz kolegija Web programiranje</li>
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

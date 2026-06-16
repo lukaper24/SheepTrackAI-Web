@@ -56,6 +56,16 @@ class SheepForm(forms.ModelForm):
             raise forms.ValidationError("Životni broj mora imati točno 9 brojeva.")
 
         return f"HR {eid}"
+    def clean(self):
+        cleaned_data = super().clean()
+
+        sex = cleaned_data.get("sex")
+        is_breeding_ram = cleaned_data.get("is_breeding_ram")
+
+        if sex == "Z" and is_breeding_ram:
+            cleaned_data["is_breeding_ram"] = False
+
+        return cleaned_data
     
 class SheepExitForm(forms.ModelForm):
         class Meta:
