@@ -110,3 +110,66 @@ def api_dashboard_stats(request):
         }
 
     return JsonResponse(data)
+
+@login_required
+def api_sheep_list(request):
+    farm = Farm.objects.filter(owner=request.user).first()
+
+    if not farm:
+        return JsonResponse({"sheep": []})
+
+    sheep = Sheep.objects.filter(
+        farm=farm,
+        status="ACTIVE"
+    ).order_by("eid_number")
+
+    data = []
+
+    for animal in sheep:
+        data.append({
+            "id": animal.id,
+            "eid_number": animal.eid_number,
+            "breed": animal.get_breed_display(),
+            "sex": animal.get_sex_display(),
+            "category": animal.get_category_display(),
+            "birth_date": animal.birth_date.strftime("%d.%m.%Y."),
+            "status": animal.get_status_display(),
+        })
+
+    return JsonResponse({"sheep": data})
+
+
+@login_required
+def api_lambing_list(request):
+    farm = Farm.objects.filter(owner=request.user).first()
+
+    if not farm:
+        return JsonResponse({"lambings": []})
+
+    lambings = Lambing.objects.filter(
+        mother__farm=farm
+    ).select_related(
+        "mother",
+        "father_sheep"
+    ).order_by("-lambing_date")[:20]
+
+    data = []
+
+    for item in lambings:
+        if item.father_sheep:
+            father = item.father_sheep.eid_number
+        elif item.father:
+            father = item.father
+        else:
+            father = "-"
+
+        data.append({
+            "id": item.id,
+            "mother": item.mother.eid_number,
+            "father": father,
+            "lambing_date": item.lambing_date.strftime("%d.%m.%Y."),
+            "lamb_count": item.lamb_count,
+            "notes": item.notes,
+        })
+
+    return JsonResponse({"lambings": data})
