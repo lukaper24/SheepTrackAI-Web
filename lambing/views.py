@@ -116,10 +116,12 @@ def lambing_create(request):
                     "Broj unesene janjadi mora odgovarati odabranom broju janjadi."
                 )
             else:
-                lambing.mother.category = "OVCA"
                 lambing.mother.save()
-                return redirect("lambing_detail", pk=lambing.pk)
 
+                if lambing.father_sheep:
+                    lambing.father_sheep.save()
+
+                return redirect("lambing_detail", pk=lambing.pk)
     else:
         form = LambingForm()
         form.fields["mother"].queryset = mothers

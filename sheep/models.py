@@ -133,6 +133,10 @@ class Sheep(models.Model):
         if self.sex == 'M':
             if self.is_breeding_ram:
                 return 'OVAN'
+
+            if self.pk and self.fathered_lambings.exists():
+                return 'OVAN'
+
             return 'OVNIC'
 
         if self.pk and self.lambings.exists():
